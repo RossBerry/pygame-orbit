@@ -74,19 +74,19 @@ class Universe(object):
     def __init__(self):
         # create planets
         self.star = Planet(
-            0, 0, 0, -0.5, 0, "star.png")
+            0, 0, 0, -0.5, 0, "./images/star.png")
         self.planet = Planet(
-            0, 300, 0.01, -1, 30, "blue_planet.png")
+            0, 300, 0.01, -1, 30, "./images/blue_planet.png")
         self.moon1 = Planet(
-            0, 75, -0.05, 3, 10, "small_moon.png")
+            0, 75, -0.05, 3, 10, "./images/small_moon.png")
         self.moon2 = Planet(
-            90, 100, 0.05, -3, 17, "big_moon.png")
+            90, 100, 0.05, -3, 17, "./images/big_moon.png")
         self.moon3 = Planet(
-            180, 125, -0.01, 3, 10, "small_moon.png")
+            180, 125, -0.01, 3, 10, "./images/small_moon.png")
         self.moon4 = Planet(
-            45, 200, 0.02, -3, 17, "big_moon.png")
+            45, 200, 0.02, -3, 17, "./images/big_moon.png")
         self.moon5 = Planet(
-            45, 50, 0.1, -3, 10, "small_moon.png")
+            45, 50, 0.1, -3, 10, "./images/small_moon.png")
     
     def event_loop(self):
         # check for pygame events
