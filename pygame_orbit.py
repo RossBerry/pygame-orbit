@@ -1,8 +1,12 @@
 """
 pygame_orbit.py
 
-The planets and moons can be selected, which will highlight them in blue and also
-draw a line between them and the object they are orbiting.
+Objects in the scene are loaded from an input file
+that must be passed in as an argument.
+
+The planets and moons can be selected, which will
+highlight them in blue and also draw a line between
+them and the object they are orbiting.
 
 Author: Kenneth Berry
 """
@@ -13,7 +17,8 @@ import types
 import pygame as pg
 
 
-# Constants 
+# Constants
+INPUT_FILE = sys.argv[1]
 CAPTION = "Orbiting & Rotating Planets"
 SCREEN_SIZE = (1280, 1024)
 BLACK     = (   0,   0,   0)
@@ -22,24 +27,29 @@ COLOR_KEY = ( 255,   0, 255)
 BACKGROUND_COLOR = BLACK
 SELECT_COLOR = BLUE
 
+
 class Planet(pg.sprite.Sprite):
-    """Planet that can rotate and orbit around another object or location."""
-    def __init__(self, orbit_a, orbit_r, orbit_s, rot_s, sel_r, image):
+    """Planet that can rotate and orbit a
+    round another object or location."""
+    def __init__(self, orbit_a, orbit_r, orbit_s, rot_s, sel_r, image, parent):
         pg.sprite.Sprite.__init__(self)
         self.loc = screen_rect.center
-        self.orbit_c = self.loc
-        self.orbit_a = orbit_a
-        self.orbit_r = orbit_r
-        self.orbit_s = orbit_s
-        self.image = pg.image.load(image).convert()
+        self.orbit_c = self.loc       # orbit center
+        self.orbit_a = int(orbit_a)   # orbit angle
+        self.orbit_r = int(orbit_r)   # orbit radius
+        self.orbit_s = float(orbit_s) # orbit speed
+        image_filename = "./images/" + image
+        print(image_filename)
+        self.image = pg.image.load(image_filename).convert()
+        self.parent = parent.rstrip()
         self.image.set_colorkey(COLOR_KEY)
         self.rect = self.image.get_rect()
-        self.rot_a = 0
-        self.rot_s = rot_s
-        self.sel = False
-        self.sel_r = sel_r
+        self.rot_a = 0                # rotation angle
+        self.rot_s = float(rot_s)     # rotation speed
+        self.sel = False              # selection flag
+        self.sel_r = int(sel_r)       # selection radius
         # add planet to planets sprite group
-        planets.add(self)
+        sprites.add(self)
         
     def rotate(self):
         # Rotate planet image.
@@ -82,21 +92,30 @@ class Universe(object):
     """Universe in which we can place planets."""
     def __init__(self):
         # create planets
-        self.star = Planet(
-            0, 0, 0, -0.5, 0, "./images/star.png")
-        self.planet = Planet(
-            0, 300, 0.01, -1, 30, "./images/blue_planet.png")
-        self.moon1 = Planet(
-            0, 75, -0.05, 3, 10, "./images/small_moon.png")
-        self.moon2 = Planet(
-            90, 100, 0.05, -3, 17, "./images/big_moon.png")
-        self.moon3 = Planet(
-            180, 125, -0.01, 3, 10, "./images/small_moon.png")
-        self.moon4 = Planet(
-            45, 200, 0.02, -3, 17, "./images/big_moon.png")
-        self.moon5 = Planet(
-            45, 50, 0.1, -3, 10, "./images/small_moon.png")
-    
+        self.load_input()
+
+    def load_input(self):
+        first_line = True;
+        count = 0
+        with open(INPUT_FILE, "r") as file:
+            for line in file:
+                if (first_line):
+                    first_line = False
+                    count = int(line)
+                    continue
+                if (count > 0):
+                    line_list = line.split(" ")
+                    new_planet = Planet(
+                        line_list[0],
+                        line_list[1],
+                        line_list[2],
+                        line_list[3],
+                        line_list[4],
+                        line_list[5],
+                        line_list[6])
+                    planets.append(new_planet)
+                    count -= 1
+
     def event_loop(self):
         # check for pygame events
         for event in pg.event.get():
@@ -106,7 +125,7 @@ class Universe(object):
                 elif event.type == pg.MOUSEBUTTONDOWN \
                      and event.button == 1: 
                     self.pos = pg.mouse.get_pos()
-                    for planet in planets.sprites():
+                    for planet in sprites.sprites():
                         # select planet if clicked with left mouse button
                         if planet.rect.collidepoint(self.pos):
                             if planet.sel == False:
@@ -116,26 +135,23 @@ class Universe(object):
                             
     def update(self):
         # update orbit center of all planets
-        self.planet.orbit_c = self.star.loc
-        self.moon1.orbit_c = self.planet.loc
-        self.moon2.orbit_c = self.planet.loc
-        self.moon3.orbit_c = self.planet.loc
-        self.moon4.orbit_c = self.planet.loc
-        self.moon5.orbit_c = self.moon4.loc
+        for planet in planets:
+            if (planet.parent != "*"):
+                planet.orbit_c = planets[int(planet.parent)].loc
         # update rotation and location of all planets
-        for planet in planets.sprites():
+        for planet in sprites.sprites():
             planet.update()
         
     def draw(self):
         screen.fill(BACKGROUND_COLOR)
         # draw selection shapes for all selected planets
-        for planet in planets.sprites():
+        for planet in sprites.sprites():
             planet.draw_selection(screen)
         # draw all planets
-        for planet in planets.sprites():
+        for planet in sprites.sprites():
             planet.draw(screen)
         # draw a circle at current mouse position
-        self.mouse_pos = pg.mouse.get_pos() 
+        self.mouse_pos = pg.mouse.get_pos()
         self.cursor = pg.draw.circle(
             screen, SELECT_COLOR, self.mouse_pos, 10)
         pg.display.flip()
@@ -148,13 +164,14 @@ class Universe(object):
             self.update()
             self.draw()
             clock.tick(30)
-            
-        
+
+
 if __name__ == "__main__":
     pg.init()
     clock = pg.time.Clock()
     pg.display.set_caption(CAPTION)
-    planets = pg.sprite.Group()
+    sprites = pg.sprite.Group()
+    planets = []
     screen = pg.display.set_mode(SCREEN_SIZE)
     screen_rect = screen.get_rect()
     pg.mouse.set_visible(False)
