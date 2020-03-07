@@ -95,7 +95,7 @@ class Universe(object):
         self.load_input()
 
     def load_input(self):
-        first_line = True;
+        first_line = True
         count = 0
         with open(INPUT_FILE, "r") as file:
             for line in file:
