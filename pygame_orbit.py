@@ -52,7 +52,7 @@ class Planet(pg.sprite.Sprite):
         sprites.add(self)
         
     def rotate(self):
-        # Rotate planet image.
+        """Rotate planet image."""
         if self.rot_a > 360:
             self.rot_a = 0
         self.rot_image = pg.transform.rotate(self.image, self.rot_a)
@@ -60,7 +60,7 @@ class Planet(pg.sprite.Sprite):
         self.rot_a += self.rot_s * 0.5
 
     def orbit(self):
-        # Orbit planet around orbit_c at speed orbit_s and radius orbit_r
+        """Orbit planet around orbit_c at speed orbit_s and radius orbit_r."""
         self.rect.centerx = (
             self.orbit_r * math.sin(
                 self.orbit_a) + self.orbit_c[0])
@@ -71,12 +71,12 @@ class Planet(pg.sprite.Sprite):
         self.loc = self.rect.center
 
     def update(self):
-        # Update planet's location.
+        """Update planet's location."""
         self.orbit()
         self.rotate()
                 
     def draw_selection(self, surface):
-        # Draw selection shapes if planet selected.
+        """Draw selection shapes if planet selected."""
         if self.sel == True:
             pg.draw.circle(
                 surface, SELECT_COLOR, self.loc, self.sel_r)
@@ -84,12 +84,12 @@ class Planet(pg.sprite.Sprite):
                 surface, SELECT_COLOR, self.loc, self.orbit_c, 4)
 
     def draw(self, surface):
-        # Draw rotated planet at updated position.
+        """Draw rotated planet at updated position."""
         surface.blit(self.rot_image, self.rect)
         
         
 class Universe(object):
-    """Universe in which we can place planets."""
+    """Universe in which to place planets."""
     def __init__(self):
         # create planets
         self.load_input()
@@ -117,7 +117,7 @@ class Universe(object):
                     count -= 1
 
     def event_loop(self):
-        # check for pygame events
+        """Check for pygame events."""
         for event in pg.event.get():
                 # end main loop if pygame window closed
                 if event.type == pg.QUIT:
@@ -134,7 +134,7 @@ class Universe(object):
                                 planet.sel = False
                             
     def update(self):
-        # update orbit center of all planets
+        """Update orbit center of all planets."""
         for planet in planets:
             if (planet.parent != "*"):
                 planet.orbit_c = planets[int(planet.parent)].loc
@@ -143,6 +143,7 @@ class Universe(object):
             planet.update()
         
     def draw(self):
+        """Draw the scene."""
         screen.fill(BACKGROUND_COLOR)
         # draw selection shapes for all selected planets
         for planet in sprites.sprites():
@@ -157,8 +158,8 @@ class Universe(object):
         pg.display.flip()
         
     def main(self):
+        """Main game loop."""
         self.done = False
-        # main loop
         while not self.done:
             self.event_loop()
             self.update()
