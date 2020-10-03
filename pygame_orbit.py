@@ -2,7 +2,8 @@
 pygame_orbit.py
 
 Objects in the scene are loaded from an input file
-that must be passed in as an argument.
+that must be passed in as an argument. See example input
+file 'scene'.
 
 The planets and moons can be selected, which will
 highlight them in blue and also draw a line between
