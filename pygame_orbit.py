@@ -89,8 +89,8 @@ class Planet(pg.sprite.Sprite):
         surface.blit(self.rot_image, self.rect)
         
         
-class Universe(object):
-    """Universe in which to place planets."""
+class Scene(object):
+    """Scene in which to place planets."""
     def __init__(self):
         # create planets
         self.load_input()
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     screen = pg.display.set_mode(SCREEN_SIZE)
     screen_rect = screen.get_rect()
     pg.mouse.set_visible(False)
-    game = Universe()
+    game = Scene()
     game.main()
     pg.quit()
     sys.exit()
